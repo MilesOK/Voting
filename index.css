@@ -388,6 +388,13 @@ button.pay:disabled{
   margin:0 0 10px;
 }
 
+.foot{
+  text-align: center;
+  color: rgb(84, 82, 82);
+  font-size: 12px;
+  margin-bottom: 60px;
+}
+
 .success p{
   color:rgba(247,250,247,0.72);
   font-size:0.95rem;
