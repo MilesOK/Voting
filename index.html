@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cast Your Vote - Annual Awards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow-line"><span class="rule"></span>2026 Edition<span class="rule"></span></div>
+    <h1>Cast your vote for the<br><em>People's Choice Awards</em></h1>
+    <p class="sub">Pick your favourite in each category below. Every vote is &#8358;100 - buy as many as you like for the nominees you're backing.</p>
+  </header>
+
+  <form class="ballot" id="ballotForm">
+
+    <div class="voter-block">
+      <div class="field">
+        <label class="field-label" for="voterName">Your full name</label>
+        <input type="text" id="voterName" name="voterName" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label class="field-label" for="voterEmail">Email (for your payment receipt)</label>
+        <input type="email" id="voterEmail" name="voterEmail" required autocomplete="email">
+      </div>
+    </div>
+
+    <div class="category" data-category="Best Class Rep">
+      <div class="category-head">
+        <span class="cat-num">01</span>
+        <span class="cat-title">Best Class Rep</span>
+      </div>
+      <div class="nominees">
+        <label class="nominee"><input type="radio" name="cat1" value="David Nkabu - 500L" required><span class="name">David Nkabu - 500L</span></label>
+        <label class="nominee"><input type="radio" name="cat1" value="Idongesit Mark - 400L"><span class="name">Idongesit Mark - 400L</span></label>
+        <label class="nominee"><input type="radio" name="cat1" value="Villian - 300L"><span class="name">Villian - 300L</span></label>
+        <label class="nominee"><input type="radio" name="cat1" value="Divine Bob - 200L"><span class="name">Divine Bob - 200L</span></label>
+      </div>
+    </div>
+
+    <div class="category" data-category="Best Student Leader">
+      <div class="category-head">
+        <span class="cat-num">02</span>
+        <span class="cat-title">Best Student Leader</span>
+      </div>
+      <div class="nominees">
+        <label class="nominee"><input type="radio" name="cat2" value="Victor Umoh" required><span class="name">Victor Umoh</span></label>
+        <label class="nominee"><input type="radio" name="cat2" value="Rt. Hon. Wilfred Ogechukwu"><span class="name">Rt. Hon. Wilfred Ogechukwu</span></label>
+        <label class="nominee"><input type="radio" name="cat2" value="Sen. Nduka Nelson"><span class="name">Sen. Nduka Nelson</span></label>
+        <label class="nominee"><input type="radio" name="cat2" value="Hon. Victor Wilson"><span class="name">Hon. Victor Wilson</span></label>
+      </div>
+    </div>
+
+    <div class="category" data-category="Brand of the Year">
+      <div class="category-head">
+        <span class="cat-num">03</span>
+        <span class="cat-title">Brand of the Year</span>
+      </div>
+      <div class="nominees">
+        <label class="nominee"><input type="radio" name="cat3" value="Vklassics" required><span class="name">Vklassics</span></label>
+        <label class="nominee"><input type="radio" name="cat3" value="DJ Slimmz"><span class="name">DJ Slimmz</span></label>
+        <label class="nominee"><input type="radio" name="cat3" value="Styler Profiles"><span class="name">Styler Profiles</span></label>
+        <label class="nominee"><input type="radio" name="cat3" value="Victor Wilson Photography"><span class="name">Victor Wilson Photography</span></label>
+        <label class="nominee"><input type="radio" name="cat3" value="iDesign"><span class="name">iDesign</span></label>
+      </div>
+    </div>
+
+    <div class="category" data-category="Entrepreneur of the Year">
+      <div class="category-head">
+        <span class="cat-num">04</span>
+        <span class="cat-title">Entrepreneur of the Year</span>
+      </div>
+      <div class="nominees">
+        <label class="nominee"><input type="radio" name="cat4" value="Idongesit Mark - Stylers Profiles" required><span class="name">Idongesit Mark - Stylers Profiles</span></label>
+        <label class="nominee"><input type="radio" name="cat4" value="Stella Obidi - Starlight Foot Thrill"><span class="name">Stella Obidi - Starlight Foot Thrill</span></label>
+        <label class="nominee"><input type="radio" name="cat4" value="Victoria Edet"><span class="name">Victoria Edet</span></label>
+        <label class="nominee"><input type="radio" name="cat4" value="Catherine Idobo"><span class="name">Catherine Idobo</span></label>
+      </div>
+    </div>
+
+    <div class="category" data-category="Outstanding Student of the Year">
+      <div class="category-head">
+        <span class="cat-num">05</span>
+        <span class="cat-title">Outstanding Student of the Year</span>
+      </div>
+      <div class="nominees">
+        <label class="nominee"><input type="radio" name="cat5" value="Joseph Ifeanyi" required><span class="name">Joseph Ifeanyi</span></label>
+        <label class="nominee"><input type="radio" name="cat5" value="Mfonido Bassey"><span class="name">Mfonido Bassey</span></label>
+        <label class="nominee"><input type="radio" name="cat5" value="Enotobong"><span class="name">Enotobong</span></label>
+        <label class="nominee"><input type="radio" name="cat5" value="Precious Bassey"><span class="name">Precious Bassey</span></label>
+        <label class="nominee"><input type="radio" name="cat5" value="Charles Wisdom"><span class="name">Charles Wisdom</span></label>
+      </div>
+    </div>
+
+    <div class="category" data-category="Artist of the Year">
+      <div class="category-head">
+        <span class="cat-num">06</span>
+        <span class="cat-title">Artist of the Year</span>
+      </div>
+      <div class="nominees">
+        <label class="nominee"><input type="radio" name="cat6" value="Allen Songs" required><span class="name">Allen Songs</span></label>
+        <label class="nominee"><input type="radio" name="cat6" value="Larry Khee"><span class="name">Larry Khee</span></label>
+      </div>
+    </div>
+
+    <div class="tally-block">
+      <div class="votes-field">
+        <label for="voteCount">Number of votes</label>
+        <div class="stepper">
+          <button type="button" id="decBtn" aria-label="Decrease">-</button>
+          <input type="text" id="voteCount" value="1" inputmode="numeric" readonly>
+          <button type="button" id="incBtn" aria-label="Increase">+</button>
+        </div>
+      </div>
+      <div class="price-summary">
+        <div class="per-vote">&#8358;100 per vote</div>
+        <div class="total" id="totalDisplay">&#8358;100</div>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button type="submit" class="pay" id="payBtn">Pay &amp; submit vote</button>
+      <div class="form-error" id="formError">Please fill in your details and pick one nominee per category.</div>
+      <p class="note">Payments are processed securely by Paystack. Your vote is recorded once payment is confirmed.</p>
+    </div>
+  </form>
+
+  <div class="success" id="successBlock">
+    <div class="mark">&#10003;</div>
+    <h2>Vote recorded</h2>
+    <p>Thanks for voting - your payment went through and your picks have been logged.</p>
+    <div class="ref" id="refDisplay"></div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

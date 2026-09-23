@@ -1,0 +1,298 @@
+:root{
+    --ink:#10151f;
+    --ink-soft:#1b2333;
+    --paper:#f6f2e7;
+    --gold:#c9a227;
+    --gold-soft:#e8d8a0;
+    --line: rgba(246,242,231,0.18);
+    --ok:#4c9a6a;
+    --err:#c9614a;
+    font-size: 17px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    min-height:100%;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter', -apple-system, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body{
+    background-image:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(201,162,39,0.14), transparent 60%);
+  }
+
+  .wrap{
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  header.hero{
+    text-align:center;
+    margin-bottom: 48px;
+  }
+
+  .eyebrow-line{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    justify-content:center;
+    margin-bottom: 18px;
+    color: var(--gold-soft);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+  .eyebrow-line span.rule{
+    height:1px; width:36px; background: var(--gold);
+    opacity:0.6;
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(2.1rem, 6vw, 3rem);
+    line-height: 1.08;
+    margin: 0 0 14px;
+  }
+  h1 em{
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .sub{
+    color: rgba(246,242,231,0.7);
+    font-size: 1.02rem;
+    max-width: 46ch;
+    margin: 0 auto;
+    line-height:1.55;
+  }
+
+  .ballot{
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .voter-block{
+    padding: 28px 26px;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .field{
+    margin-bottom: 16px;
+  }
+  .field:last-child{ margin-bottom:0; }
+
+  label.field-label{
+    display:block;
+    font-size: 0.82rem;
+    color: rgba(246,242,231,0.6);
+    margin-bottom: 6px;
+  }
+
+  input[type=text], input[type=email], select{
+    width:100%;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-family:'Inter', sans-serif;
+    font-size: 0.98rem;
+  }
+  input:focus, select:focus{
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+    border-color: transparent;
+  }
+
+  .category{
+    padding: 28px 26px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .category:last-of-type{ border-bottom: none; }
+
+  .category-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom: 16px;
+  }
+  .cat-num{
+    font-family:'Fraunces', serif;
+    color: var(--gold);
+    font-size: 1.05rem;
+  }
+  .cat-title{
+    font-family:'Fraunces', serif;
+    font-size: 1.28rem;
+    font-weight:500;
+  }
+
+  .nominees{
+    display:grid;
+    gap:10px;
+  }
+
+  .nominee{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    cursor:pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .nominee:hover{ border-color: rgba(201,162,39,0.5); }
+  .nominee input{ accent-color: var(--gold); width:17px; height:17px; flex:none; }
+  .nominee.checked{
+    border-color: var(--gold);
+    background: rgba(201,162,39,0.08);
+  }
+  .nominee .name{ font-size:0.98rem; }
+
+  .tally-block{
+    padding: 26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    align-items:flex-end;
+    justify-content:space-between;
+  }
+
+  .votes-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .votes-field label{
+    font-size: 0.82rem;
+    color: rgba(246,242,231,0.6);
+  }
+  .stepper{
+    display:flex;
+    align-items:center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow:hidden;
+  }
+  .stepper button{
+    background: var(--ink);
+    color: var(--paper);
+    border:none;
+    width:38px; height:40px;
+    font-size:1.1rem;
+    cursor:pointer;
+  }
+  .stepper button:hover{ background: rgba(201,162,39,0.15); }
+  .stepper input{
+    width:52px;
+    text-align:center;
+    border:none;
+    background:var(--ink);
+    color:var(--paper);
+    font-size:1rem;
+    padding:0;
+    height:40px;
+  }
+  .stepper input:focus{ outline:none; }
+
+  .price-summary{
+    text-align:right;
+  }
+  .price-summary .per-vote{
+    font-size:0.8rem;
+    color: rgba(246,242,231,0.55);
+  }
+  .price-summary .total{
+    font-family:'Fraunces', serif;
+    font-size: 1.7rem;
+    color: var(--gold);
+  }
+
+  .submit-row{
+    padding: 0 26px 28px;
+  }
+
+  button.pay{
+    width:100%;
+    padding: 15px 20px;
+    background: var(--gold);
+    color: var(--ink);
+    border:none;
+    border-radius: 9px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:1rem;
+    cursor:pointer;
+    transition: transform .12s ease, background .12s ease;
+  }
+  button.pay:hover{ background: #dbb437; }
+  button.pay:active{ transform: scale(0.99); }
+  button.pay:disabled{
+    opacity:0.55;
+    cursor:not-allowed;
+  }
+
+  .note{
+    text-align:center;
+    font-size: 0.8rem;
+    color: rgba(246,242,231,0.45);
+    margin-top: 14px;
+    line-height:1.5;
+  }
+
+  .form-error{
+    color: var(--err);
+    font-size: 0.85rem;
+    text-align:center;
+    margin-top: 10px;
+    display:none;
+  }
+
+  /* success state */
+  .success{
+    display:none;
+    text-align:center;
+    padding: 50px 26px;
+  }
+  .success .mark{
+    width:56px; height:56px;
+    border-radius: 50%;
+    border: 1px solid var(--ok);
+    color: var(--ok);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto 20px;
+    font-size:1.4rem;
+  }
+  .success h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:1.6rem;
+    margin: 0 0 10px;
+  }
+  .success p{
+    color: rgba(246,242,231,0.65);
+    font-size:0.95rem;
+    line-height:1.6;
+    max-width: 40ch;
+    margin: 0 auto;
+  }
+  .success .ref{
+    margin-top:18px;
+    font-family: monospace;
+    font-size:0.82rem;
+    color: var(--gold-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    button.pay{ transition:none; }
+  }
