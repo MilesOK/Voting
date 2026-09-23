@@ -88,7 +88,7 @@ document.querySelectorAll('.nominee input[type=radio]').forEach(radio => {
 });
 
 function submitToGoogleForm(data){
-  if (!CONFIG.GOOGLE_FORM_ID) return;
+  if (!CONFIG.GOOGLE_FORM_ID) return Promise.resolve();
 
   const url = `https://docs.google.com/forms/d/e/${CONFIG.GOOGLE_FORM_ID}/formResponse`;
   const body = new URLSearchParams();
@@ -99,7 +99,7 @@ function submitToGoogleForm(data){
     }
   });
 
-  fetch(url, { method: 'POST', mode: 'no-cors', body });
+  return fetch(url, { method: 'POST', mode: 'no-cors', body });
 }
 
 form.addEventListener('submit', (e) => {
@@ -140,8 +140,8 @@ form.addEventListener('submit', (e) => {
         { display_name: "Votes", variable_name: "vote_count", value: votes }
       ]
     },
-    callback: function(response){
-      submitToGoogleForm(voteData);
+    callback: async function(response){
+      await submitToGoogleForm(voteData);
 
       form.style.display = 'none';
       successBlock.style.display = 'block';
