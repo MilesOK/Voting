@@ -2,7 +2,7 @@
    CONFIG - edit these before you publish the page
    ============================================================ */
 const CONFIG = {
-  PAYSTACK_PAYMENT_LINK: "https://paystack.shop/pay/xwvtursgu-",
+  PAYSTACK_PUBLIC_KEY: "pk_live_2967508e0ab79ebcd6315e1d395779647723738d",
 
   PRICE_PER_VOTE: 100, // in Naira
   CURRENCY: "NGN",
@@ -18,16 +18,17 @@ const CONFIG = {
   //   3. Paste the form ID and entry IDs below. Leave GOOGLE_FORM_ID blank
   //      to skip this step (payment will still work, it just won't log
   //      anywhere).
-  GOOGLE_FORM_ID: "", // the long id from your form's edit URL
+  GOOGLE_FORM_ID: "1FAIpQLSfIBUqE84VV1LZAfwM1XCby4MncWCAk_GCqq_ECfQV8GvNnqA",
   ENTRY_IDS: {
-    voterName: "",   // e.g. "entry.111111111"
-    voterEmail: "",  // e.g. "entry.222222222"
-    cat1: "",        // e.g. "entry.333333333"
-    cat2: "",
-    cat3: "",
-    cat4: "",
-    cat5: "",
-    cat6: ""
+    voterName: "entry.1621638349",
+    voterEmail: "entry.1084533075",
+    cat1: "entry.1188965834",
+    cat2: "entry.1604472042",
+    cat3: "entry.1287639373",
+    cat4: "entry.1283939619",
+    cat5: "entry.112384709",
+    cat6: "entry.1138384303",
+    votes: "entry.1564330355"
   }
 };
 /* ============================================================ */
@@ -115,6 +116,7 @@ form.addEventListener('submit', (e) => {
   }
 
   const votes = currentVotes();
+  const amountKobo = votes * CONFIG.PRICE_PER_VOTE * 100;
   const voteData = {
     voterName,
     voterEmail,
@@ -127,8 +129,31 @@ form.addEventListener('submit', (e) => {
   payBtn.disabled = true;
   payBtn.textContent = 'Opening Paystack...';
 
-  submitToGoogleForm(voteData);
-  window.location.href = CONFIG.PAYSTACK_PAYMENT_LINK;
+  const handler = PaystackPop.setup({
+    key: CONFIG.PAYSTACK_PUBLIC_KEY,
+    email: voterEmail,
+    amount: amountKobo,
+    currency: CONFIG.CURRENCY,
+    metadata: {
+      custom_fields: [
+        { display_name: "Voter", variable_name: "voter_name", value: voterName },
+        { display_name: "Votes", variable_name: "vote_count", value: votes }
+      ]
+    },
+    callback: function(response){
+      submitToGoogleForm(voteData);
+
+      form.style.display = 'none';
+      successBlock.style.display = 'block';
+      refDisplay.textContent = 'Ref: ' + response.reference;
+    },
+    onClose: function(){
+      payBtn.disabled = false;
+      payBtn.textContent = 'Pay & submit vote';
+    }
+  });
+
+  handler.openIframe();
 });
 
 updateTotal();
