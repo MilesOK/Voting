@@ -145,11 +145,14 @@ form.addEventListener('submit', (e) => {
   }
 
   try {
-    const handler = PaystackPop.setup({
+    const paystack = new PaystackPop();
+
+    paystack.newTransaction({
       key: CONFIG.PAYSTACK_PUBLIC_KEY,
       email: voterEmail,
       amount: amountKobo,
       currency: CONFIG.CURRENCY,
+      ref: `vote_${Date.now()}`,
       metadata: {
         custom_fields: [
           { display_name: "Voter", variable_name: "voter_name", value: voterName },
@@ -157,22 +160,26 @@ form.addEventListener('submit', (e) => {
           { display_name: "Selected Categories", variable_name: "selected_categories", value: categoryCount }
         ]
       },
-      callback: async function(response){
+      onSuccess: async function(transaction){
         await submitToGoogleForm(voteData);
 
         form.style.display = 'none';
         successBlock.style.display = 'block';
-        refDisplay.textContent = 'Ref: ' + response.reference;
+        refDisplay.textContent = 'Ref: ' + transaction.reference;
       },
-      onClose: function(){
+      onCancel: function(){
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay & submit vote';
+      },
+      onError: function(error){
+        formError.textContent = `Paystack error: ${error.message || 'Please refresh the page and try again.'}`;
+        formError.style.display = 'block';
         payBtn.disabled = false;
         payBtn.textContent = 'Pay & submit vote';
       }
     });
-
-    handler.openIframe();
   } catch (error) {
-    formError.textContent = 'Paystack did not open. Please refresh the page and try again.';
+    formError.textContent = `Paystack did not open: ${error.message || 'Please refresh the page and try again.'}`;
     formError.style.display = 'block';
     payBtn.disabled = false;
     payBtn.textContent = 'Pay & submit vote';
