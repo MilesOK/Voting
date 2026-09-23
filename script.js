@@ -2,9 +2,7 @@
    CONFIG - edit these before you publish the page
    ============================================================ */
 const CONFIG = {
-  // Get this from your Paystack dashboard -> Settings -> API Keys & Webhooks.
-  // Use the pk_test_... key while testing, switch to pk_live_... when live.
-  PAYSTACK_PUBLIC_KEY: "pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY",
+  PAYSTACK_PAYMENT_LINK: "https://paystack.shop/pay/xwvtursgu-",
 
   PRICE_PER_VOTE: 100, // in Naira
   CURRENCY: "NGN",
@@ -116,51 +114,21 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  if (CONFIG.PAYSTACK_PUBLIC_KEY.includes('REPLACE_WITH')) {
-    formError.textContent = 'This page needs a real Paystack public key before it can take payments - see the CONFIG block in the code.';
-    formError.style.display = 'block';
-    return;
-  }
-
   const votes = currentVotes();
-  const amountKobo = votes * CONFIG.PRICE_PER_VOTE * 100;
+  const voteData = {
+    voterName,
+    voterEmail,
+    votes,
+    ...Object.fromEntries(
+      Object.entries(selections).map(([categoryName, selection]) => [categoryName, selection.value])
+    )
+  };
 
   payBtn.disabled = true;
-  payBtn.textContent = 'Opening payment...';
+  payBtn.textContent = 'Opening Paystack...';
 
-  const handler = PaystackPop.setup({
-    key: CONFIG.PAYSTACK_PUBLIC_KEY,
-    email: voterEmail,
-    amount: amountKobo,
-    currency: CONFIG.CURRENCY,
-    metadata: {
-      custom_fields: [
-        { display_name: "Voter", variable_name: "voter_name", value: voterName },
-        { display_name: "Votes", variable_name: "vote_count", value: votes }
-      ]
-    },
-    callback: function(response){
-      const voteData = {
-        voterName,
-        voterEmail,
-        ...Object.fromEntries(
-          Object.entries(selections).map(([categoryName, selection]) => [categoryName, selection.value])
-        )
-      };
-
-      submitToGoogleForm(voteData);
-
-      form.style.display = 'none';
-      successBlock.style.display = 'block';
-      refDisplay.textContent = 'Ref: ' + response.reference;
-    },
-    onClose: function(){
-      payBtn.disabled = false;
-      payBtn.textContent = 'Pay & submit vote';
-    }
-  });
-
-  handler.openIframe();
+  submitToGoogleForm(voteData);
+  window.location.href = CONFIG.PAYSTACK_PAYMENT_LINK;
 });
 
 updateTotal();
