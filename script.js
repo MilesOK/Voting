@@ -51,8 +51,12 @@ function currentVotes(){
   return parseInt(voteCountEl.value, 10) || 1;
 }
 
+function selectedCategoryCount(){
+  return Object.values(getCategorySelections()).filter(Boolean).length;
+}
+
 function updateTotal(){
-  const total = currentVotes() * CONFIG.PRICE_PER_VOTE;
+  const total = selectedCategoryCount() * currentVotes() * CONFIG.PRICE_PER_VOTE;
   totalDisplay.textContent = formatNaira(total);
 }
 
@@ -84,6 +88,7 @@ document.querySelectorAll('.nominee input[type=radio]').forEach(radio => {
   radio.addEventListener('change', () => {
     const group = document.getElementsByName(radio.name);
     group.forEach(r => r.closest('.nominee').classList.toggle('checked', r.checked));
+    updateTotal();
   });
 });
 
@@ -109,20 +114,22 @@ form.addEventListener('submit', (e) => {
   const voterName = document.getElementById('voterName').value.trim();
   const voterEmail = document.getElementById('voterEmail').value.trim();
   const selections = getCategorySelections();
+  const selectedEntries = Object.entries(selections).filter(([, selection]) => selection);
+  const categoryCount = selectedEntries.length;
 
-  if (!voterName || !voterEmail || Object.values(selections).some(selection => !selection)) {
+  if (!voterName || !voterEmail || categoryCount === 0) {
     formError.style.display = 'block';
     return;
   }
 
   const votes = currentVotes();
-  const amountKobo = votes * CONFIG.PRICE_PER_VOTE * 100;
+  const amountKobo = categoryCount * votes * CONFIG.PRICE_PER_VOTE * 100;
   const voteData = {
     voterName,
     voterEmail,
     votes,
     ...Object.fromEntries(
-      Object.entries(selections).map(([categoryName, selection]) => [categoryName, selection.value])
+      selectedEntries.map(([categoryName, selection]) => [categoryName, selection.value])
     )
   };
 
@@ -137,7 +144,8 @@ form.addEventListener('submit', (e) => {
     metadata: {
       custom_fields: [
         { display_name: "Voter", variable_name: "voter_name", value: voterName },
-        { display_name: "Votes", variable_name: "vote_count", value: votes }
+        { display_name: "Votes", variable_name: "vote_count", value: votes },
+        { display_name: "Selected Categories", variable_name: "selected_categories", value: categoryCount }
       ]
     },
     callback: async function(response){
