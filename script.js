@@ -136,32 +136,48 @@ form.addEventListener('submit', (e) => {
   payBtn.disabled = true;
   payBtn.textContent = 'Opening Paystack...';
 
-  const handler = PaystackPop.setup({
-    key: CONFIG.PAYSTACK_PUBLIC_KEY,
-    email: voterEmail,
-    amount: amountKobo,
-    currency: CONFIG.CURRENCY,
-    metadata: {
-      custom_fields: [
-        { display_name: "Voter", variable_name: "voter_name", value: voterName },
-        { display_name: "Votes", variable_name: "vote_count", value: votes },
-        { display_name: "Selected Categories", variable_name: "selected_categories", value: categoryCount }
-      ]
-    },
-    callback: async function(response){
-      await submitToGoogleForm(voteData);
+  if (!window.PaystackPop) {
+    formError.textContent = 'Paystack could not load. Please check your internet connection, disable ad blockers, and try again.';
+    formError.style.display = 'block';
+    payBtn.disabled = false;
+    payBtn.textContent = 'Pay & submit vote';
+    return;
+  }
 
-      form.style.display = 'none';
-      successBlock.style.display = 'block';
-      refDisplay.textContent = 'Ref: ' + response.reference;
-    },
-    onClose: function(){
-      payBtn.disabled = false;
-      payBtn.textContent = 'Pay & submit vote';
-    }
-  });
+  try {
+    const handler = PaystackPop.setup({
+      key: CONFIG.PAYSTACK_PUBLIC_KEY,
+      email: voterEmail,
+      amount: amountKobo,
+      currency: CONFIG.CURRENCY,
+      metadata: {
+        custom_fields: [
+          { display_name: "Voter", variable_name: "voter_name", value: voterName },
+          { display_name: "Votes", variable_name: "vote_count", value: votes },
+          { display_name: "Selected Categories", variable_name: "selected_categories", value: categoryCount }
+        ]
+      },
+      callback: async function(response){
+        await submitToGoogleForm(voteData);
 
-  handler.openIframe();
+        form.style.display = 'none';
+        successBlock.style.display = 'block';
+        refDisplay.textContent = 'Ref: ' + response.reference;
+      },
+      onClose: function(){
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay & submit vote';
+      }
+    });
+
+    handler.openIframe();
+  } catch (error) {
+    formError.textContent = 'Paystack did not open. Please refresh the page and try again.';
+    formError.style.display = 'block';
+    payBtn.disabled = false;
+    payBtn.textContent = 'Pay & submit vote';
+    console.error(error);
+  }
 });
 
 updateTotal();
