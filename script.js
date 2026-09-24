@@ -1,4 +1,37 @@
-const PRICE_PER_VOTE = 100;
+/* ============================================================
+   CONFIG - edit these before you publish the page
+   ============================================================ */
+const CONFIG = {
+  PAYSTACK_PUBLIC_KEY: "pk_live_2967508e0ab79ebcd6315e1d395779647723738d",
+
+  PRICE_PER_VOTE: 100, // in Naira
+  CURRENCY: "NGN",
+
+  // Optional: wire this page up to a Google Form so every paid vote is
+  // logged as a row in the Form's response spreadsheet.
+  //   1. Create a Google Form with a short-answer question for name and
+  //      email, plus one multiple-choice question per category, using the
+  //      exact same option text as the "value" attributes above.
+  //   2. In the Form editor, click the menu -> "Get pre-filled link",
+  //      fill in dummy answers, click "Get link", then open that link and
+  //      copy each "entry.XXXXXXXXX" number from the URL.
+  //   3. Paste the form ID and entry IDs below. Leave GOOGLE_FORM_ID blank
+  //      to skip this step (payment will still work, it just won't log
+  //      anywhere).
+  GOOGLE_FORM_ID: "1FAIpQLSfIBUqE84VV1LZAfwM1XCby4MncWCAk_GCqq_ECfQV8GvNnqA",
+  ENTRY_IDS: {
+    voterName: "entry.1621638349",
+    voterEmail: "entry.1084533075",
+    cat1: "entry.1188965834",
+    cat2: "entry.1604472042",
+    cat3: "entry.1287639373",
+    cat4: "entry.1283939619",
+    cat5: "entry.112384709",
+    cat6: "entry.1138384303",
+    votes: "entry.1564330355"
+  }
+};
+/* ============================================================ */
 
 const form = document.getElementById('ballotForm');
 const voteCountEl = document.getElementById('voteCount');
@@ -23,7 +56,7 @@ function selectedCategoryCount(){
 }
 
 function updateTotal(){
-  const total = selectedCategoryCount() * currentVotes() * PRICE_PER_VOTE;
+  const total = selectedCategoryCount() * currentVotes() * CONFIG.PRICE_PER_VOTE;
   totalDisplay.textContent = formatNaira(total);
 }
 
@@ -37,18 +70,6 @@ function getCategorySelections(){
     picked[firstOption.name] = form.querySelector(`input[name="${firstOption.name}"]:checked`);
     return picked;
   }, {});
-}
-
-async function readApiResponse(response) {
-  const body = await response.text();
-  try {
-    return JSON.parse(body);
-  } catch {
-    if (response.status === 404) {
-      throw new Error('Payment service is unavailable. Please contact the organiser or try again later.');
-    }
-    throw new Error('Payment service returned an invalid response. Please try again later.');
-  }
 }
 
 decBtn.addEventListener('click', () => {
@@ -71,29 +92,22 @@ document.querySelectorAll('.nominee input[type=radio]').forEach(radio => {
   });
 });
 
-async function showPaymentResult() {
-  const reference = new URLSearchParams(window.location.search).get('reference');
-  if (!reference) return;
+function submitToGoogleForm(data){
+  if (!CONFIG.GOOGLE_FORM_ID) return Promise.resolve();
 
-  payBtn.disabled = true;
-  payBtn.textContent = 'Confirming payment...';
-  try {
-    const response = await fetch(`/api/payments/${encodeURIComponent(reference)}`);
-    const result = await readApiResponse(response);
-    if (!response.ok || result.status !== 'paid') throw new Error(result.message || 'Payment is still being confirmed.');
-    form.style.display = 'none';
-    successBlock.style.display = 'block';
-    refDisplay.textContent = `Ref: ${reference}`;
-    window.history.replaceState({}, document.title, window.location.pathname);
-  } catch (error) {
-    formError.textContent = error.message || 'We could not confirm your payment yet. Please refresh shortly.';
-    formError.style.display = 'block';
-    payBtn.disabled = false;
-    payBtn.textContent = 'Pay & submit vote';
-  }
+  const url = `https://docs.google.com/forms/d/e/${CONFIG.GOOGLE_FORM_ID}/formResponse`;
+  const body = new URLSearchParams();
+
+  Object.entries(CONFIG.ENTRY_IDS).forEach(([field, entryId]) => {
+    if (entryId && data[field] !== undefined) {
+      body.append(entryId, data[field]);
+    }
+  });
+
+  return fetch(url, { method: 'POST', mode: 'no-cors', body });
 }
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', (e) => {
   e.preventDefault();
   formError.style.display = 'none';
 
@@ -109,6 +123,7 @@ form.addEventListener('submit', async (e) => {
   }
 
   const votes = currentVotes();
+  const amountKobo = categoryCount * votes * CONFIG.PRICE_PER_VOTE * 100;
   const voteData = {
     voterName,
     voterEmail,
@@ -119,19 +134,52 @@ form.addEventListener('submit', async (e) => {
   };
 
   payBtn.disabled = true;
-  payBtn.textContent = 'Preparing payment...';
+  payBtn.textContent = 'Opening Paystack...';
+
+  if (!window.PaystackPop) {
+    formError.textContent = 'Paystack could not load. Please check your internet connection, disable ad blockers, and try again.';
+    formError.style.display = 'block';
+    payBtn.disabled = false;
+    payBtn.textContent = 'Pay & submit vote';
+    return;
+  }
 
   try {
-    const response = await fetch('/api/payments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...voteData, selections: Object.fromEntries(selectedEntries.map(([key, selection]) => [key, selection.value])) })
+    const paystack = new PaystackPop();
+
+    paystack.newTransaction({
+      key: CONFIG.PAYSTACK_PUBLIC_KEY,
+      email: voterEmail,
+      amount: amountKobo,
+      currency: CONFIG.CURRENCY,
+      ref: `vote_${Date.now()}`,
+      metadata: {
+        custom_fields: [
+          { display_name: "Voter", variable_name: "voter_name", value: voterName },
+          { display_name: "Votes", variable_name: "vote_count", value: votes },
+          { display_name: "Selected Categories", variable_name: "selected_categories", value: categoryCount }
+        ]
+      },
+      onSuccess: async function(transaction){
+        await submitToGoogleForm(voteData);
+
+        form.style.display = 'none';
+        successBlock.style.display = 'block';
+        refDisplay.textContent = 'Ref: ' + transaction.reference;
+      },
+      onCancel: function(){
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay & submit vote';
+      },
+      onError: function(error){
+        formError.textContent = `Paystack error: ${error.message || 'Please refresh the page and try again.'}`;
+        formError.style.display = 'block';
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay & submit vote';
+      }
     });
-    const result = await readApiResponse(response);
-    if (!response.ok) throw new Error(result.message || 'Unable to start payment.');
-    window.location.assign(result.authorizationUrl);
   } catch (error) {
-    formError.textContent = error.message || 'Unable to start payment. Please refresh and try again.';
+    formError.textContent = `Paystack did not open: ${error.message || 'Please refresh the page and try again.'}`;
     formError.style.display = 'block';
     payBtn.disabled = false;
     payBtn.textContent = 'Pay & submit vote';
@@ -140,4 +188,3 @@ form.addEventListener('submit', async (e) => {
 });
 
 updateTotal();
-showPaymentResult();
