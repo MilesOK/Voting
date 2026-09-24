@@ -39,6 +39,18 @@ function getCategorySelections(){
   }, {});
 }
 
+async function readApiResponse(response) {
+  const body = await response.text();
+  try {
+    return JSON.parse(body);
+  } catch {
+    if (response.status === 404) {
+      throw new Error('Payment service is unavailable. Please contact the organiser or try again later.');
+    }
+    throw new Error('Payment service returned an invalid response. Please try again later.');
+  }
+}
+
 decBtn.addEventListener('click', () => {
   const v = Math.max(1, currentVotes() - 1);
   voteCountEl.value = v;
@@ -67,7 +79,7 @@ async function showPaymentResult() {
   payBtn.textContent = 'Confirming payment...';
   try {
     const response = await fetch(`/api/payments/${encodeURIComponent(reference)}`);
-    const result = await response.json();
+    const result = await readApiResponse(response);
     if (!response.ok || result.status !== 'paid') throw new Error(result.message || 'Payment is still being confirmed.');
     form.style.display = 'none';
     successBlock.style.display = 'block';
@@ -115,7 +127,7 @@ form.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...voteData, selections: Object.fromEntries(selectedEntries.map(([key, selection]) => [key, selection.value])) })
     });
-    const result = await response.json();
+    const result = await readApiResponse(response);
     if (!response.ok) throw new Error(result.message || 'Unable to start payment.');
     window.location.assign(result.authorizationUrl);
   } catch (error) {

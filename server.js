@@ -208,6 +208,16 @@ app.get('/api/payments/:reference', async (request, response) => {
   }
 });
 
+app.use('/api', (_request, response) => {
+  response.status(404).json({ message: 'Payment service endpoint was not found.' });
+});
+
+app.use((error, _request, response, _next) => {
+  console.error('Request failed:', error.message);
+  if (response.headersSent) return;
+  response.status(error.status || 500).json({ message: 'Payment service is temporarily unavailable.' });
+});
+
 setInterval(() => {
   pool.query("SELECT payment_reference FROM google_form_deliveries WHERE state = 'pending' AND next_attempt_at <= NOW() ORDER BY next_attempt_at LIMIT 20")
     .then(({ rows }) => Promise.allSettled(rows.map(({ payment_reference }) => deliverGoogleForm(payment_reference))))
